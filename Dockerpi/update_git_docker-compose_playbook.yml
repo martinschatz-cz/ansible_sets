@@ -2,6 +2,10 @@
 - hosts: local
   become: yes
   tasks:
+    - name: Clean apt cache (if needed)
+      shell: "rm -rf /var/cache/apt/archives/* && rm -rf /var/lib/apt/lists/*"
+      ignore_errors: yes  # Allow this task to fail without stopping the playboo
+      
     - name: Update apt cache
       apt:
         update_cache: yes
