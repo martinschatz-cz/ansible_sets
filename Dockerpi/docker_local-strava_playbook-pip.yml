@@ -11,6 +11,14 @@
       apt:
         update_cache: yes
 
+    - name: Install essential build dependencies
+      apt:
+        name:
+          - build-essential
+          - libffi-dev
+          - python3-dev
+        state: present
+
     - name: Install required system packages
       apt:
         name:
@@ -33,16 +41,16 @@
 
     - name: Ensure project directory exists
       file:
-        path: /home/schatzm/local_strava_dashboard
+        path: /home/{{ your_raspberry_pi_username }}/local_strava_dashboard
         state: directory
 
     - name: Clone Git repository
       git:
         repo: https://github.com/martinschatz-cz/local_strava_dashboard.git
-        dest: /home/schatzm/local_strava_dashboard
+        dest: /home/{{ your_raspberry_pi_username }}/local_strava_dashboard
         update: yes
 
     - name: Build and start Docker Compose project
       shell:
         cmd: "{{ venv_path }}/bin/docker-compose up -d --build"
-        chdir: /home/schatzm/local_strava_dashboard
+        chdir: /home/{{ your_raspberry_pi_username }}/local_strava_dashboard
