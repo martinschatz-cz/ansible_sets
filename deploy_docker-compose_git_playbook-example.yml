@@ -1,0 +1,35 @@
+---
+- name: Deploy Docker Compose Applications
+  hosts: your_server_group  # Will be defined dynamically
+  become: yes
+  vars:
+    github_repository: "your_github_username/your_repository_name" # Replace with your info
+    repo_local_path: "/home/{{ ansible_user }}/app" # Where to clone the repo
+  tasks:
+    - name: Ensure necessary packages are installed for Git
+      apt:
+        name: git
+        state: present
+
+    - name: Clone the GitHub repository
+      git:
+        repo: "https://github.com/{{ github_repository }}.git"
+        dest: "{{ repo_local_path }}"
+        version: main # Or your desired branch
+        accept_hostkey: yes
+      become_user: "{{ ansible_user }}" # Run git as the connecting user
+
+    - name: Ensure Docker Compose is present (assuming installed in previous steps)
+      command: which docker-compose
+      register: docker_compose_check
+      ignore_errors: yes
+
+    - name: Navigate to the application directory
+      command: "cd {{ repo_local_path }}"
+      become_user: "{{ ansible_user }}"
+      changed_when: false # Doesn't count as a change
+
+    - name: Run Docker Compose Up (if docker-compose is installed)
+      command: "docker-compose up -d"
+      become_user: "{{ ansible_user }}"
+      when: docker_compose_check.rc == 0

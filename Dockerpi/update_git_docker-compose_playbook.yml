@@ -1,0 +1,48 @@
+---
+- hosts: local
+  become: yes
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Upgrade packages
+      apt:
+        upgrade: full
+        autoremove: yes
+        autoclean: yes
+
+    - name: Install or upgrade Git
+      apt:
+        name: git
+        state: present
+        update_cache: yes
+
+    - name: Install Docker dependencies
+      apt:
+        name: apt-transport-https
+        state: present
+
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/debian/gpg
+        state: present
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: deb [arch=armhf] https://download.docker.com/linux/raspbian bullseye stable
+        state: present
+        filename: docker
+
+    - name: Install Docker
+      apt:
+        name: docker-ce
+        state: present
+        update_cache: yes
+
+    - name: Install Docker Compose
+      apt:
+        name: docker-compose-plugin
+        state: present
+        update_cache: yes
