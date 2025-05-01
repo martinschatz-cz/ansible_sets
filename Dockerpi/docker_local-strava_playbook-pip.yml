@@ -5,6 +5,8 @@
 
   vars:
     your_raspberry_pi_username: "schatzm"
+    venv_path: "/home/{{ your_raspberry_pi_username }}/.venv_docker_compose"
+    python_version: "3" # Assuming python3 is the desired version
 
   tasks:
     - name: Update apt cache
@@ -14,18 +16,38 @@
     - name: Install essential system packages
       apt:
         name:
-          - python3
-          - python3-pip
+          - python{{ python_version }}
+          - python{{ python_version }}-pip
+          - python{{ python_version }}-venv
           - docker.io
         state: present
 
-    - name: Install Docker Compose using Pip with specific PyYAML version
-      ansible.builtin.pip:
+    - name: Create virtual environment for Docker Compose
+      command:
+        cmd: "python{{ python_version }} -m venv {{ venv_path }}"
+      args:
+        creates: "{{ venv_path }}/bin/activate"
+
+    - name: Upgrade pip and setuptools in virtual environment
+      pip:
         name:
-          - pyyaml==5.3.1
-          - docker-compose
-        state: present
-        executable: pip3
+          - pip
+          - setuptools
+        virtualenv: "{{ venv_path }}"
+        executable: "{{ venv_path }}/bin/pip{{ python_version }}"
+        state: latest
+
+    - name: Install specific PyYAML version in virtual environment
+      pip:
+        name: pyyaml==5.3.1
+        virtualenv: "{{ venv_path }}"
+        executable: "{{ venv_path }}/bin/pip{{ python_version }}"
+
+    - name: Install Docker Compose in virtual environment
+      pip:
+        name: docker-compose
+        virtualenv: "{{ venv_path }}"
+        executable: "{{ venv_path }}/bin/pip{{ python_version }}"
 
     - name: Ensure project directory exists
       file:
@@ -40,5 +62,5 @@
 
     - name: Build and start Docker Compose project
       shell:
-        cmd: docker-compose up -d --build
+        cmd: "{{ venv_path }}/bin/docker-compose up -d --build"
         chdir: /home/{{ your_raspberry_pi_username }}/local_strava_dashboard
