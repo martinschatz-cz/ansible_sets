@@ -16,10 +16,12 @@
           - docker.io
         state: present
 
-    - name: Install Docker Compose
-      pip:
-        name: docker-compose
-        state: present
+    - name: Install Docker Compose (using binary download)
+      get_url:
+        url: https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64
+        dest: /usr/local/bin/docker-compose
+        mode: '0755'
+      become: yes
 
     - name: Ensure project directory exists
       file:
