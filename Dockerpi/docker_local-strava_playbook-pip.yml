@@ -41,6 +41,11 @@
         name: pyyaml==5.3.1
         virtualenv: "{{ venv_path }}"
 
+    - name: Install Docker SDK for Python in virtual environment
+      pip:
+        name: docker
+        virtualenv: "{{ venv_path }}"
+
     - name: Install Docker Compose in virtual environment
       pip:
         name: docker-compose
