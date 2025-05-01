@@ -5,6 +5,7 @@
 
   vars:
     venv_path: "/home/schatzm/.venv_docker_compose"
+    your_raspberry_pi_username: "schatzm"
 
   tasks:
     - name: Update apt cache
@@ -34,7 +35,21 @@
       args:
         creates: "{{ venv_path }}/bin/activate"
 
-    - name: Install Docker Compose in virtual environment
+    - name: Upgrade pip and setuptools in virtual environment
+      pip:
+        name:
+          - pip
+          - setuptools
+        virtualenv: "{{ venv_path }}"
+        state: latest
+
+    - name: Install PyYAML from PyPI (without piwheels)
+      pip:
+        name: PyYAML
+        virtualenv: "{{ venv_path }}"
+        extra_args: "--no-cache-dir --no-index --find-links https://pypi.org/simple"
+
+    - name: Install Docker Compose in virtual environment (using potentially updated PyYAML)
       pip:
         name: docker-compose
         virtualenv: "{{ venv_path }}"
