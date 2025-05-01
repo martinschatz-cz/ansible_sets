@@ -8,19 +8,6 @@
       apt:
         update_cache: yes
 
-    - name: Install required packages
-      apt:
-        name:
-          - python3
-          - python3-pip
-          - docker.io
-        state: present
-
-    - name: Install Docker Compose
-      pip:
-        name: docker-compose
-        state: present
-
     - name: Ensure project directory exists
       file:
         path: /home/schatzm/local_strava_dashboard
