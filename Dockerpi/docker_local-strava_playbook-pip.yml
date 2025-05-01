@@ -4,56 +4,28 @@
   become: yes
 
   vars:
-    venv_path: "/home/schatzm/.venv_docker_compose"
     your_raspberry_pi_username: "schatzm"
-    python_version: "3.10"
 
   tasks:
     - name: Update apt cache
       apt:
         update_cache: yes
 
-    - name: Ensure Python 3.10 is installed
+    - name: Install essential system packages
       apt:
-        name: python{{ python_version }}
-        state: present
-
-    - name: Ensure pip for Python 3.10 is installed
-      apt:
-        name: python{{ python_version }}-pip
-        state: present
-
-    - name: Ensure virtualenv for Python 3.10 is installed
-      apt:
-        name: python{{ python_version }}-venv
-        state: present
-
-    - name: Create virtual environment for Docker Compose (Python 3.10)
-      command:
-        cmd: "python{{ python_version }} -m venv {{ venv_path }}"
-      args:
-        creates: "{{ venv_path }}/bin/activate"
-
-    - name: Upgrade pip and setuptools in virtual environment (Python 3.10)
-      pip:
         name:
-          - pip
-          - setuptools
-        virtualenv: "{{ venv_path }}"
-        executable: "{{ venv_path }}/bin/pip{{ python_version }}"
-        state: latest
+          - python3
+          - python3-pip
+          - docker.io
+        state: present
 
-    - name: Install PyYAML in virtual environment (Python 3.10)
-      pip:
-        name: PyYAML
-        virtualenv: "{{ venv_path }}"
-        executable: "{{ venv_path }}/bin/pip{{ python_version }}"
-
-    - name: Install Docker Compose in virtual environment (Python 3.10)
-      pip:
-        name: docker-compose
-        virtualenv: "{{ venv_path }}"
-        executable: "{{ venv_path }}/bin/pip{{ python_version }}"
+    - name: Install Docker Compose using Pip with specific PyYAML version
+      ansible.builtin.pip:
+        name:
+          - pyyaml==5.3.1
+          - docker-compose
+        state: present
+        executable: pip3
 
     - name: Ensure project directory exists
       file:
@@ -68,5 +40,5 @@
 
     - name: Build and start Docker Compose project
       shell:
-        cmd: "{{ venv_path }}/bin/docker-compose up -d --build"
+        cmd: docker-compose up -d --build
         chdir: /home/{{ your_raspberry_pi_username }}/local_strava_dashboard
