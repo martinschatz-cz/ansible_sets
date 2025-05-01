@@ -34,20 +34,17 @@
           - pip
           - setuptools
         virtualenv: "{{ venv_path }}"
-        executable: "{{ venv_path }}/bin/pip{{ python_version }}"
         state: latest
 
     - name: Install specific PyYAML version in virtual environment
       pip:
         name: pyyaml==5.3.1
         virtualenv: "{{ venv_path }}"
-        executable: "{{ venv_path }}/bin/pip{{ python_version }}"
 
     - name: Install Docker Compose in virtual environment
       pip:
         name: docker-compose
         virtualenv: "{{ venv_path }}"
-        executable: "{{ venv_path }}/bin/pip{{ python_version }}"
 
     - name: Ensure project directory exists
       file:
