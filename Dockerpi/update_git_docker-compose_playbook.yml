@@ -43,12 +43,23 @@
         repo: deb [arch=armhf] https://download.docker.com/linux/raspbian bullseye stable
         state: present
         filename: docker
+      when: ansible_architecture == "armv7l"  # For 32-bit Raspberry Pi
+
+    - name: Add Docker repository (arm64)
+      apt_repository:
+        repo: deb [arch=arm64] https://download.docker.com/linux/debian bullseye stable
+        state: present
+        filename: docker
+      when: ansible_architecture == "aarch64"  # For 64-bit Raspberry Pi
+
+    - name: Update apt cache (after adding Docker repo)
+      apt:
+        update_cache: yes
 
     - name: Install Docker
       apt:
         name: docker-ce
         state: present
-        update_cache: yes
 
     - name: Install Docker Compose
       apt:
