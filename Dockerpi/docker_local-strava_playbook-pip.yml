@@ -6,35 +6,35 @@
   vars:
     venv_path: "/home/schatzm/.venv_docker_compose"
     your_raspberry_pi_username: "schatzm"
-    python_version: "3.9"
+    python_version: "3.10"
 
   tasks:
     - name: Update apt cache
       apt:
         update_cache: yes
 
-    - name: Ensure Python 3.9 is installed
+    - name: Ensure Python 3.10 is installed
       apt:
         name: python{{ python_version }}
         state: present
 
-    - name: Ensure pip for Python 3.9 is installed
+    - name: Ensure pip for Python 3.10 is installed
       apt:
         name: python{{ python_version }}-pip
         state: present
 
-    - name: Ensure virtualenv for Python 3.9 is installed
+    - name: Ensure virtualenv for Python 3.10 is installed
       apt:
         name: python{{ python_version }}-venv
         state: present
 
-    - name: Create virtual environment for Docker Compose (Python 3.9)
+    - name: Create virtual environment for Docker Compose (Python 3.10)
       command:
         cmd: "python{{ python_version }} -m venv {{ venv_path }}"
       args:
         creates: "{{ venv_path }}/bin/activate"
 
-    - name: Upgrade pip and setuptools in virtual environment (Python 3.9)
+    - name: Upgrade pip and setuptools in virtual environment (Python 3.10)
       pip:
         name:
           - pip
@@ -43,13 +43,13 @@
         executable: "{{ venv_path }}/bin/pip{{ python_version }}"
         state: latest
 
-    - name: Install PyYAML in virtual environment (Python 3.9)
+    - name: Install PyYAML in virtual environment (Python 3.10)
       pip:
         name: PyYAML
         virtualenv: "{{ venv_path }}"
         executable: "{{ venv_path }}/bin/pip{{ python_version }}"
 
-    - name: Install Docker Compose in virtual environment (Python 3.9)
+    - name: Install Docker Compose in virtual environment (Python 3.10)
       pip:
         name: docker-compose
         virtualenv: "{{ venv_path }}"
