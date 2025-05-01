@@ -16,12 +16,10 @@
           - docker.io
         state: present
 
-    - name: Install Docker Compose (using binary download)
-      get_url:
-        url: https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64
-        dest: /usr/local/bin/docker-compose
-        mode: '0755'
-      become: yes
+    - name: Install Docker Compose
+      pip:
+        name: docker-compose
+        state: present
 
     - name: Ensure project directory exists
       file:
@@ -34,8 +32,8 @@
         dest: /home/schatzm/local_strava_dashboard
         update: yes
 
-    - name: Deploy Docker Compose project
+    - name: Build and start Docker Compose project
       community.docker.docker_compose:
         project_src: /home/schatzm/local_strava_dashboard
         state: present
-        pull: yes
+        build: yes
