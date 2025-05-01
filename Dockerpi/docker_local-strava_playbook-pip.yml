@@ -1,0 +1,48 @@
+---
+- name: Deploy and Build Local Strava Dashboard with Docker Compose via Shell
+  hosts: local
+  become: yes
+
+  vars:
+    venv_path: "/home/schatzm/.venv_docker_compose"
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install required system packages
+      apt:
+        name:
+          - python3
+          - python3-pip
+          - python3-venv
+          - docker.io
+        state: present
+
+    - name: Create virtual environment for Docker Compose
+      command:
+        cmd: "python3 -m venv {{ venv_path }}"
+      args:
+        creates: "{{ venv_path }}/bin/activate"
+
+    - name: Install Docker Compose in virtual environment
+      pip:
+        name: docker-compose
+        virtualenv: "{{ venv_path }}"
+
+    - name: Ensure project directory exists
+      file:
+        path: /home/schatzm/local_strava_dashboard
+        state: directory
+
+    - name: Clone Git repository
+      git:
+        repo: https://github.com/martinschatz-cz/local_strava_dashboard.git
+        dest: /home/schatzm/local_strava_dashboard
+        update: yes
+
+    - name: Build and start Docker Compose project
+      shell:
+        cmd: "{{ venv_path }}/bin/docker-compose up -d --build"
+        chdir: /home/schatzm/local_strava_dashboard
